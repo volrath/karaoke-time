@@ -37,6 +37,8 @@
 ;;; Code:
 
 (require 'seq)
+(defvar karaoke-time--buffer-name "*Karaoke Time!*"
+  "Name of the Karaoke Time buffer.")
 
 
 (defun karaoke--time-mark-to-seconds (time-mark-str)
@@ -85,7 +87,7 @@
   (message "Start playing %S" song-filename))
 
 
-(defun karaoke--read-and-setup-lyrics (lyrics-buffer)
+(defun karaoke--read-and-schedule-lyrics! (lyrics-buffer)
   "Read and schedule all lines in LYRICS-BUFFER."
   (with-current-buffer lyrics-buffer
     (let (next-line
@@ -102,13 +104,45 @@
 Current buffer is expected to be a .lrc file.  All lines of this file are
 schedule right away."
   (interactive "fSong file: ")
-  (let ((karaoke-buffer (get-buffer-create "*Karaoke Time!*"))
+  (let ((karaoke-buffer (get-buffer-create karaoke-time--buffer-name))
         (lyrics-buffer (current-buffer)))
     (window-configuration-to-register '_)
-    (display-buffer karaoke-buffer)
     (delete-other-windows)
+    (switch-to-buffer karaoke-buffer)
+    (karaoke-time-mode)
     (karaoke--play! song-filename)
-    (karaoke--read-and-setup-lyrics lyrics-buffer)))
+    (karaoke--read-and-schedule-lyrics! lyrics-buffer)))
+
+
+(defun karaoke-quit ()
+  "Quit karaoke time and stop music."
+  (interactive)
+  (when-let (karaoke-buffer (get-buffer karaoke-time--buffer-name))
+    (kill-buffer karaoke-buffer)
+    ;; TODO: Stop music
+    (jump-to-register '_)))
+
+
+;; Karaoke Time mode
+;; ----------------------------------------------------------------------------
+
+(defvar karaoke-time-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "q") #'karaoke-quit)
+    ;; TODO: pause
+    map))
+
+(defvar karaoke-time-mode-hook nil
+  "Hook for `karaoke-time-mode'.")
+
+
+(define-derived-mode karaoke-time-mode nil "Karaoke Time!"
+  "Major mode for enjoying Karaoke Time.
+
+\\{karaoke-time-mode-map}"
+  (buffer-face-set 'org-level-1)
+  (text-scale-adjust 8)
+  (run-hooks 'karaoke-time-mode-hook))
 
 
 (provide 'karaoke-mode)
