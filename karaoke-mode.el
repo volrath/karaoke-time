@@ -50,6 +50,10 @@
   "Name of the Karaoke Time buffer.")
 
 
+(defvar-local karaoke-time--scheduled-lines nil
+  "List of scheduled lines timers.")
+
+
 (defun karaoke--time-mark-to-seconds (time-mark-str)
   "Transform TIME-MARK-STR to a float amount of seconds."
   (seq-let [minutes seconds] (mapcar #'string-to-number (split-string time-mark-str ":"))
@@ -98,9 +102,10 @@
 
 (defun karaoke--schedule-next-line! (from-time time-mark line)
   "Schedule LINE at TIME-MARK after FROM-TIME."
-  (run-at-time (karaoke--line-time time-mark from-time)
-               nil
-               #'karaoke--show-line! line))
+  (add-to-list 'karaoke-time--scheduled-lines
+               (run-at-time (karaoke--line-time time-mark from-time)
+                            nil
+                            #'karaoke--show-line! line)))
 
 
 (defun karaoke--play! (song-filename)
@@ -140,6 +145,7 @@ schedule right away."
   (interactive)
   (when-let (karaoke-buffer (get-buffer karaoke-time--buffer-name))
     (kill-buffer karaoke-buffer)
+    (mapc #'cancel-timer karaoke-time--scheduled-lines)
     ;; TODO: Stop music
     (jump-to-register '_)))
 
@@ -162,7 +168,7 @@ schedule right away."
 
 \\{karaoke-time-mode-map}"
   (buffer-face-set 'org-level-1)
-  (text-scale-adjust 8)
+  (text-scale-adjust 7)
   (run-hooks 'karaoke-time-mode-hook))
 
 
