@@ -37,6 +37,15 @@
 ;;; Code:
 
 (require 'seq)
+(require 'subr-x)
+
+
+(defgroup karaoke-time '()
+  "Emacs mode for having a good karaoke time."
+  :prefix "karaoke-"
+  :group 'karaoke-time)
+
+
 (defvar karaoke-time--buffer-name "*Karaoke Time!*"
   "Name of the Karaoke Time buffer.")
 
@@ -69,10 +78,22 @@
 
 (defun karaoke--show-line! (line)
   "Show LINE in karaoke buffer."
-  (with-current-buffer (get-buffer "*Karaoke Time!*")
-    (erase-buffer)
-    (insert line)
-    (insert "\n")))
+  (when-let (karaoke-time-buffer (get-buffer karaoke-time--buffer-name))
+    (when-let (karaoke-time-window (display-buffer karaoke-time-buffer))
+      (with-current-buffer karaoke-time-buffer
+        (erase-buffer)
+        (insert line)
+        (insert "\n")
+        (with-selected-window karaoke-time-window
+          (let* ((window-height (window-body-height karaoke-time-window t))
+                 (window-width (/ (window-body-width karaoke-time-window) 3))
+                 (content-height (cdr (posn-x-y (posn-at-point))))
+                 (padding-top (/ (- window-height content-height) 2))
+                 (padding-left (ceiling (/ (- window-width (length line)) 2))))
+            (goto-char (point-min))
+            (insert (propertize "\n" 'line-height padding-top))
+            (indent-to-column padding-left)
+            (goto-char (point-max))))))))
 
 
 (defun karaoke--schedule-next-line! (from-time time-mark line)
