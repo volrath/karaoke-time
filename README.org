@@ -1,0 +1,46 @@
+#+TITLE:     Karaoke Time!
+#+AUTHOR:    Daniel Barreto
+#+EMAIL:     daniel@barreto.tech
+#+DESCRIPTION: Karaoke Time!
+#+LANGUAGE:  en
+#+OPTIONS:   H:4 num:nil toc:2 p:t
+#+STARTUP: showall
+
+- *Wait, what?*
+- "What" what?
+
+
+- *A karaoke mode for emacs... don't you have better things to do with your life?*
+- Better than Karaoke?! I don't think so.
+
+
+- *Seriously, though...*
+- Seriously, in a friendly conversation at [[http://emacs-berlin.org/][Emacs Berlin]] we were joking about
+  doing a Karaoke night, but of course we would need a "Karaoke mode" for
+  Emacs. So...
+
+
+- *Alright, how does it work?*
+- Easy... clone the repo, load the only file there is:
+
+  #+BEGIN_SRC emacs-lisp
+  (load "/path/to/karaoke-time.el")
+  #+END_SRC
+
+  Then open a [[https://en.wikipedia.org/wiki/LRC_(file_format)][LRC File]] and invoke =karaoke-time=:
+  #+BEGIN_SRC
+  M-x karaoke-time
+  #+END_SRC
+
+  It will ask you for a song file that matches the lyrics, provide one and get
+  ready to sing!
+
+
+- *Cool, is it production ready?*
+- If your business is in Karaoke, you might want to try something else.
+  I made this as a proof of concept, just a quick example of a simple and small
+  program to talk about in [[http://emacs-berlin.org][Emacs Berlin]].
+
+
+- *Are you open to contributions?*
+- don't you have better things to do with your life? ... but yeah, I am =)
