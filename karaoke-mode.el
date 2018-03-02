@@ -50,6 +50,14 @@
   "Name of the Karaoke Time buffer.")
 
 
+(defvar karaoke-time--song-buffer-name "*Karaoke Time Song*"
+  "Name of Karaoke Time song process buffer.")
+
+
+(defvar-local karaoke-time--song-process nil
+  "Shell music player process.")
+
+
 (defvar-local karaoke-time--scheduled-lines nil
   "List of scheduled lines timers.")
 
@@ -108,9 +116,19 @@
                             #'karaoke--show-line! line)))
 
 
-(defun karaoke--play! (song-filename)
+(defun karaoke--play-song! (song-filename)
   "Play SONG-FILENAME."
-  (message "Start playing %S" song-filename))
+  (setq-local karaoke-time--song-process
+              (start-process-shell-command "karaoke-time-song" karaoke-time--song-buffer-name
+                                           (format "mpg123 %s" (shell-quote-argument song-filename)))))
+
+
+(defun karaoke--stop-song! ()
+  "Stop whatever song is running in `karaoke-time--song-process'."
+  (with-current-buffer karaoke-time--buffer-name
+    (when (and (boundp 'karaoke-time--song-process)
+               (processp karaoke-time--song-process))
+      (kill-process karaoke-time--song-process))))
 
 
 (defun karaoke--read-and-schedule-lyrics! (lyrics-buffer)
@@ -136,7 +154,7 @@ schedule right away."
     (delete-other-windows)
     (switch-to-buffer karaoke-buffer)
     (karaoke-time-mode)
-    (karaoke--play! song-filename)
+    (karaoke--play-song! song-filename)
     (karaoke--read-and-schedule-lyrics! lyrics-buffer)))
 
 
@@ -144,9 +162,9 @@ schedule right away."
   "Quit karaoke time and stop music."
   (interactive)
   (when-let (karaoke-buffer (get-buffer karaoke-time--buffer-name))
-    (kill-buffer karaoke-buffer)
+    (karaoke--stop-song!)
     (mapc #'cancel-timer karaoke-time--scheduled-lines)
-    ;; TODO: Stop music
+    (kill-buffer karaoke-buffer)
     (jump-to-register '_)))
 
 
