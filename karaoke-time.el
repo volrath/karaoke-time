@@ -1,4 +1,4 @@
-;;; karaoke-mode.el --- Karaoke Mode! because why not? -*- lexical-binding: t; -*-
+;;; karaoke-time.el --- Karaoke Mode! because why not? -*- lexical-binding: t; -*-
 ;; 
 ;; Filename: karaoke-mode.el
 ;; Description: Simple Karaoke Mode for .lrc files
@@ -190,6 +190,6 @@ schedule right away."
   (run-hooks 'karaoke-time-mode-hook))
 
 
-(provide 'karaoke-mode)
+(provide 'karaoke-time)
 
-;;; karaoke-mode.el ends here
+;;; karaoke-time.el ends here
